@@ -26,6 +26,9 @@ from django.db.models import Q
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.contrib.auth import get_user_model
+from rest_framework import generics
+from account.models import Order
+from .serializers import OrderSerializer
 
 User = get_user_model()
 
@@ -44,22 +47,22 @@ class UserLogin(APIView):
 
     def post(self, request):
         try:
-            email = request.data['email']
+            username = request.data['username']
             password = request.data['password']
-            print(email, password)
+            print(username, password)
 
         except KeyError:
             raise ParseError('All Fields Are Required')
 
-        if not User.objects.filter(email=email).exists():
+        if not User.objects.filter(username=username).exists():
             # raise AuthenticationFailed('Invalid Email Address')
             return Response({'detail': 'Email Does Not Exist'}, status=status.HTTP_403_FORBIDDEN)
 
-        if not User.objects.filter(email=email, is_active=True).exists():
+        if not User.objects.filter(username=username, is_active=True).exists():
             raise AuthenticationFailed(
                 'You are blocked by admin ! Please contact admin')
 
-        user = authenticate(username=email, password=password)
+        user = authenticate(username=username, password=password)
         if user is None:
             raise AuthenticationFailed('Invalid Password')
 
@@ -74,7 +77,6 @@ class UserLogin(APIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'isAdmin': user.is_superuser,
-            'is_doctor': user.is_doctor(),
         }
         print(content)
         return Response(content, status=status.HTTP_200_OK)
@@ -98,3 +100,11 @@ class LogoutView(APIView):
 
 
     
+
+class OrderListCreateView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+class OrderRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer

@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken, Token,AccessToken
 from django.contrib.auth import get_user_model
+from account.models import Order
 
 User = get_user_model()
 
@@ -19,10 +20,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         return token
 
-class UserSerializer(serializers.ModelSerializer):
+
+class OrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        exclude = ('password', )
+        model = Order
+        fields = '__all__'
+
 
 
 

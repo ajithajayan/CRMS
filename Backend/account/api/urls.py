@@ -17,6 +17,14 @@ urlpatterns = [
     path('logout', views.LogoutView.as_view(), name='logout'),
 
 
+    # ************************* Order Summary ************************
+
+    path('orders/', views.OrderListCreateView.as_view(), name='order-list-create'),
+    path('orders/<int:pk>/', views.OrderRetrieveUpdateDestroyView.as_view(), name='order-detail'),  
+   
+    
+
+    
 
     
 
