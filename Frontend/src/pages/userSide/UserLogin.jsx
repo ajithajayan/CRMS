@@ -130,7 +130,7 @@ function UserLogin() {
         ></div>
         
         <div className="w-full p-8 lg:w-1/2  ">
-          <p className="text-3xl text-gray-600 font-bold  text-white  text-center">Patient Login</p>
+          <p className="text-3xl text-gray-600 font-bold  text-white  text-center">Login</p>
           <form className="form" method="POST" onSubmit={handleLoginSubmit}>
             <div className="mt-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -228,9 +228,9 @@ function UserLogin() {
               />
             </svg>
           </span>
-          <Link to="/auth/doctor/login">
+          <Link to="/admincontrol/login">
             <span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
-              Login as A Doctor
+              Login as Admin
             </span>
           </Link>
         </div>

@@ -9,7 +9,7 @@ const DRESS_STATUSES = [
     { value: 'FINISHED', label: 'Finished' },
 ];
 
-const OrderList = () => {
+const PendingOrder = () => {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +36,8 @@ const OrderList = () => {
             const filtered = orders.filter(order => {
                 const matchesSearch = order.customer_contact_number.includes(searchTerm);
                 const matchesStatus = statusFilter ? order.order_status === statusFilter : true;
-                return matchesSearch && matchesStatus;
+                const isNotFinished = order.order_status !== 'FINISHED';
+                return matchesSearch && matchesStatus && isNotFinished;
             });
 
             setFilteredOrders(filtered);
@@ -67,8 +68,47 @@ const OrderList = () => {
         return (amountPerPiece * quantity) - advanceAmount;
     };
 
+    const printOrderDetails = (order) => {
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.open();
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print Order Details</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+                    th { background-color: #f4f4f4; }
+                </style>
+            </head>
+            <body>
+                <h1>Order Details</h1>
+                <table>
+                    <tr><th>Order ID</th><td>${order.order_id}</td></tr>
+                    <tr><th>Customer Name</th><td>${order.customer_name}</td></tr>
+                    <tr><th>Contact Number</th><td>${order.customer_contact_number}</td></tr>
+                    <tr><th>Dress Type</th><td>${order.dress_type}</td></tr>
+                    <tr><th>Amount Per Piece</th><td>${order.amount_per_piece}</td></tr>
+                    <tr><th>Quantity</th><td>${order.quantity}</td></tr>
+                    <tr><th>Advance Amount</th><td>${order.advance_amount}</td></tr>
+                    <tr><th>Tailor Name</th><td>${order.tailor_name}</td></tr>
+                    <tr><th>Remaining Balance</th><td>${calculateRemainingBalance(order.amount_per_piece, order.quantity, order.advance_amount).toFixed(2)}</td></tr>
+                    <tr><th>Finishing Date</th><td>${new Date(order.finishing_date).toLocaleDateString()}</td></tr>
+                    <tr><th>Status</th><td>${order.order_status}</td></tr>
+                </table>
+                <script>
+                    window.print();
+                    window.onafterprint = function() { window.close(); };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     return (
-        <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-md">
+        <div className="mx-auto p-6 bg-white shadow-md rounded-md">
             <h2 className="text-2xl font-bold mb-6">Order List</h2>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div className="flex items-center mb-4 sm:mb-0">
@@ -134,16 +174,22 @@ const OrderList = () => {
                                     <td className="px-6 py-4 text-sm">
                                         <button
                                             onClick={() => handleEditClick(order.order_id)}
-                                            className="text-blue-500 hover:text-blue-700"
+                                            className="text-blue-500 hover:text-blue-700 mr-2"
                                         >
                                             Edit
+                                        </button>
+                                        <button
+                                            onClick={() => printOrderDetails(order)}
+                                            className="text-green-500 hover:text-green-700"
+                                        >
+                                            Print
                                         </button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="11" className="px-6 py-4 text-center text-gray-500">No orders found</td>
+                                <td colSpan="12" className="px-6 py-4 text-center text-gray-500">No orders found</td>
                             </tr>
                         )}
                     </tbody>
@@ -163,4 +209,4 @@ const OrderList = () => {
     );
 };
 
-export default OrderList;
+export default PendingOrder;

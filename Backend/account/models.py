@@ -41,6 +41,8 @@ class Order(models.Model):
             else:
                 self.order_id = self.ORDER_ID_START
         super(Order, self).save(*args, **kwargs)
+
+
     
     def __str__(self):
         return f"Order {self.order_id} - {self.customer_name}"

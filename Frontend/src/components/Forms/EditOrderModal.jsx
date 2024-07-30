@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
 import { baseUrl } from '../../utils/constants/Constants';
@@ -19,6 +19,7 @@ const ORDER_STATUSES = [
 
 const EditOrderModal = ({ orderId, isOpen, onClose, onOrderUpdated }) => {
     const { control, handleSubmit, setValue, watch } = useForm();
+    const [pictureUrl, setPictureUrl] = useState(null);
 
     const amountPerPiece = watch('amount_per_piece');
     const quantity = watch('quantity');
@@ -33,6 +34,11 @@ const EditOrderModal = ({ orderId, isOpen, onClose, onOrderUpdated }) => {
                     const order = response.data;
                     // Set form values with fetched order data
                     Object.keys(order).forEach((key) => setValue(key, order[key]));
+
+                    // Set picture URL
+                    if (order.sketch_picture) {
+                        setPictureUrl(order.sketch_picture);
+                    }
                 } catch (error) {
                     console.error('Error fetching order:', error);
                 }
@@ -44,7 +50,10 @@ const EditOrderModal = ({ orderId, isOpen, onClose, onOrderUpdated }) => {
 
     const onSubmit = async (data) => {
         try {
-            await axios.put(`${baseUrl}/auth/orders/${orderId}/`, data, {
+            // Exclude the sketch_picture from the data being sent
+            const { sketch_picture, ...updatedData } = data;
+            
+            await axios.put(`${baseUrl}/auth/orders/${orderId}/`, updatedData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -70,6 +79,7 @@ const EditOrderModal = ({ orderId, isOpen, onClose, onOrderUpdated }) => {
             >
                 <h2 className="text-2xl font-bold mb-4">Edit Order</h2>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Existing fields */}
                     <div className="mb-4">
                         <label className="block text-gray-700 font-bold mb-2">Customer Name</label>
                         <Controller
@@ -203,6 +213,17 @@ const EditOrderModal = ({ orderId, isOpen, onClose, onOrderUpdated }) => {
                             className="w-full px-3 py-2 border rounded-md bg-gray-100"
                         />
                     </div>
+                    {/* Picture Preview */}
+                    {pictureUrl && (
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-bold mb-2">Sketch Picture</label>
+                            <img
+                                src={pictureUrl}
+                                alt="Sketch"
+                                className="w-full h-auto border rounded-md"
+                            />
+                        </div>
+                    )}
                     <button
                         type="submit"
                         className="w-full px-4 py-2 text-white bg-green-500 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"

@@ -36,7 +36,7 @@ const navConfig = [
   },
   {
     title: 'Pending',
-    path: '/admincontrol/DocVerification',
+    path: '/admincontrol/pending-order',
     icon: icon('ic_lock'),
   },
   // {
